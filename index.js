@@ -6,21 +6,48 @@ var express = require('express'),
 // start webserver on port 3000
 var server =  http.createServer(app);
 var io = socketIo.listen(server);
-server.listen(3000);
+server.listen(8080);
 // add directory with our static files
 app.use(express.static(__dirname + '/static'));
-console.log("Server running on 127.0.0.1:3000");
+console.log("Server running on 127.0.0.1:8080");
 
 // array of all lines drawn
-var lines = []
+var players = {};
+var canvasDetails = [];
+var numPlayers = 1;
 
 // event-handler for new incoming connections
 io.on('connection', function (socket) {
 
-    // first send the history to the new client
-    for (const i in lines) {
-        socket.emit('draw_line', { line: lines[i].line, style: lines[i].style, size: lines[i].size, color: lines[i].color });
-    }
+    socket.emit('setRoom', socket.id);
+
+    socket.on('getRoom',function (room) {
+        socket.join(room);
+        if(typeof players[room] === 'undefined') {
+            players[room] = {
+                lines: [],
+                name: numPlayers.toString()
+            }
+            socket.emit('done_loading');
+        }
+        else {
+            for(var i in players[room].lines)
+            {
+                socket.emit('draw_line',players[room].lines[i]);
+            }
+            socket.emit('done_loading');
+        }
+    });
+
+
+    socket.on('clear',function (room) {
+        players[room] = {
+            lines: [],
+            name: numPlayers.toString()
+        }
+        console.log('clear called');
+        io.sockets.in(room).emit('clear_canvas');
+    });
 
     // add handler for message type "draw_line".
     socket.on('draw_line', function (data) {
@@ -31,14 +58,17 @@ io.on('connection', function (socket) {
         line_info.size = data.size;
         line_info.style = data.style;
 
-        lines.push(line_info);
+        players[data.room].lines.push(line_info);
         // send line to all clients
-        io.emit('draw_line', { line: data.line, style: data.style, size: data.size, color: data.color });
+        io.sockets.in(data.room).emit('draw_line', { line: data.line, style: data.style, size: data.size, color: data.color, room: data.room });
     });
 
-    socket.on('clear', function () {
-       lines = [];
-       console.log('clear called');
-       io.emit('clear_canvas');
+    socket.on('disconnect', function (data) {
+        delete players[socket.room];
+        delete canvasDetails[socket.room];
+        io.emit('popPhoto', socket.room);
+
     });
+
+
 });
