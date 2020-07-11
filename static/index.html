@@ -1,0 +1,45 @@
+<html>
+<head>
+    <title>A Multiplayer Game</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="css/game.css" />
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+<div id="loader">
+    <img id="loading-icon" src="img/palette.svg" alt="palette icon for loading" />
+    <p>loading canvas...</p>
+</div>
+<div class="screen" id="screen">
+    <div id="sideNavLeft" class="sidenav-left">
+        <a href="javascript:void(0)" style="display: none" class="closebtn" onclick="closeNavLeft()">&times;</a>
+        <div>
+            <input class="form-control" style="width: 50%" type="color" id="brushcolor" name="brushcolor"
+                   value="#e66465">
+            <label for="brushcolor">Brush Color</label>
+        </div>
+        <div>
+            <input class="form-control" type="number" style="width: 50%" id="brushsize" name="brushsize"
+                   value="10" min="1">
+            <label for="brushsize">Brush Size</label>
+        </div>
+        <div id="roomName">
+            <p>Room Name: </p>
+        </div>
+
+    </div>
+
+    <div id="sideNavRight" class="sidenav-right">
+        <a href="javascript:void(0)" style="display: none" class="closebtn" onclick="closeNavLeft()">&times;</a>
+
+    </div>
+
+    <canvas id="drawing"></canvas>
+</div>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+<script type="text/javascript" src="js/game.js"></script>
+</body>
+
+</html>
